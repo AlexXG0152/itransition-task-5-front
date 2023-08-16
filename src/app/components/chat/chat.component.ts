@@ -69,23 +69,29 @@ export class ChatComponent {
       return;
     }
 
+    const createTags = [
+      ...new Set(
+        this.tags
+          ?.trim()
+          .replaceAll('#', '')
+          .split(',')
+          .map((i) => i.trim())
+      ),
+      ...new Set(
+        this.newMessage.match(/#\w+/g)?.map((i) => i.replace('#', ''))
+      ),
+    ];
+
+    if (createTags[0] === '') {
+      createTags.length = 0;
+    }
+
     const message: IMessage = {
       socketId: this.socketId[0],
       user: this.usernameInput,
       text: this.newMessage.trim(),
       date: Date.now().toString(),
-      tags: [
-        ...new Set(
-          this.tags
-            ?.trim()
-            .replaceAll('#', '')
-            .split(',')
-            .map((i) => i.trim())
-        ),
-        ...new Set(
-          this.newMessage.match(/#\w+/g)?.map((i) => i.replace('#', ''))
-        ),
-      ],
+      tags: createTags,
     };
 
     this.chatService.sendMessage(message);

@@ -1,7 +1,7 @@
 <div class="container pt-3">
 
   <div class="tags">
-    <div class="tag" *ngFor="let tag of tags">
+    <div class="tag" *ngFor="let tag of messageTagList">
       <li *ngIf="tag" class="text-break">
         {{ tag }}
         <button type="button" class="btn-close" aria-label="Close" (click)="removeTag(tag)"></button>
@@ -9,11 +9,19 @@
     </div>
   </div>
 
+  <div class="form-group">
+    <div class="autocomplete-list">
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let tag of filteredTags" (click)="addTag(tag)">{{ tag }}</li>
+      </ul>
+    </div>
+  </div>
+
   <div class="bottom-div">
     <div class="input-group mb-3">
       <span class="input-group-text" id="basic-addon1">#</span>
       <input type="text" class="form-control" placeholder="Tags" aria-label="Tag" aria-describedby="basic-addon1"
-        [(ngModel)]="newTag" (keyup)="$event.keyCode == 13 && addTag(newTag)">
+        [(ngModel)]="newTag" (input)="searchTags()">
       <button type="button" class="btn btn-success" (click)="addTag(newTag)">Add Tag</button>
     </div>
   </div>
@@ -22,4 +30,8 @@
 
 <!--
 [(ngModel)]="newTag" (keyup)="search(searchTag.value)" #searchTag>
+
+[(ngModel)]="newTag" (keyup)="$event.keyCode == 13 && addTag(newTag)">
+
+
 -->

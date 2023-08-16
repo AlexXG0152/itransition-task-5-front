@@ -10,47 +10,47 @@ import { of } from 'rxjs/internal/observable/of';
 export class DatabaseService {
   constructor(private http: HttpClient) {}
 
-  MESSAGES_API = environment.MESSAGES_API;
+  API = environment.MESSAGES_API;
 
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
   };
 
   messageList: IMessage[] = [];
-  tagList: Set<string> = new Set([]);
+  messageTagList: Set<string> = new Set([]);
+  searchTagList: Set<string> = new Set([]);
 
   getAllMesagesByTags() {
-    const tags = this.tagList.size > 0 ? this.tagList : '';
+    const tags = this.messageTagList.size > 0 ? this.messageTagList : '';
 
     return this.http
-      .post<IMessage[]>(
-        `${this.MESSAGES_API}`,
-        { tags: [...tags] },
-        this.httpOptions
-      )
+      .post<IMessage[]>(`${this.API}`, { tags: [...tags] }, this.httpOptions)
       .subscribe((response) => {
         this.messageList.push(...response);
       });
   }
 
   createMessage(data: IMessage) {
-    return this.http.post<IMessage>(this.MESSAGES_API, data);
+    return this.http.post<IMessage>(this.API, data);
   }
 
   addTag(tag: string) {
     if (tag && tag.trim() !== '') {
-      this.tagList.add(tag.trim());
+      this.messageTagList.add(tag.trim());
     }
   }
 
   removeTag(tag: string) {
-    this.tagList.delete(tag);
+    this.messageTagList.delete(tag);
   }
 
-  earchTags(term: string){
-    if(!term.trim()){
-      return of([])
-    }
-    return this.http.get(`${this.MESSAGES_API}/?tag=${term}`)
+  searchTags(tag: string) {
+    return this.http.get(`${this.API}/tags?q=${tag}`).subscribe((data: any) => {
+      data.map((i: string) => {
+        if (i.trim()) {
+          this.searchTagList.add(i);
+        }
+      });
+    });
   }
 }
