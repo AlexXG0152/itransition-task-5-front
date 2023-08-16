@@ -1,11 +1,10 @@
-<div *ngFor="let message of messageList">
-  <li>
-      {{message}}
-  </li>
+<div class="container">
+  <div class="row">
+    <div class="col-4 align-self-start">
+      <app-tags></app-tags>
+    </div>
+    <div class="col-8 align-self-center">
+      <app-chat></app-chat>
+    </div>
+  </div>
 </div>
-
-<input
-  [(ngModel)]="newMessage"
-  (keyup)="$event.keyCode == 13 && sendMessage()"
-/>
-<button (click)="sendMessage()">Send Message</button>
