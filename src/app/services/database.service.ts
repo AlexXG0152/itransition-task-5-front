@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IMessage } from '../interfaces/message.interface';
 import { environment } from 'src/environments/environment';
+import { of } from 'rxjs/internal/observable/of';
 
 @Injectable({
   providedIn: 'root',
@@ -15,21 +16,41 @@ export class DatabaseService {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
   };
 
-  getAllMesages() {
-    return this.http.get<IMessage[]>(this.MESSAGES_API);
-  }
+  messageList: IMessage[] = [];
+  tagList: Set<string> = new Set([]);
 
-  getAllMesagesByTags(tags: string[]) {
-    return this.http.post<IMessage[]>(
-      `${this.MESSAGES_API}`,
-      { tags },
-      this.httpOptions
-    );
-  }
+  getAllMesagesByTags() {
+    const tags = this.tagList.size > 0 ? this.tagList : '';
 
-  getMesageById() {}
+    return this.http
+      .post<IMessage[]>(
+        `${this.MESSAGES_API}`,
+        { tags: [...tags] },
+        this.httpOptions
+      )
+      .subscribe((response) => {
+        this.messageList.push(...response);
+      });
+  }
 
   createMessage(data: IMessage) {
     return this.http.post<IMessage>(this.MESSAGES_API, data);
+  }
+
+  addTag(tag: string) {
+    if (tag && tag.trim() !== '') {
+      this.tagList.add(tag.trim());
+    }
+  }
+
+  removeTag(tag: string) {
+    this.tagList.delete(tag);
+  }
+
+  earchTags(term: string){
+    if(!term.trim()){
+      return of([])
+    }
+    return this.http.get(`${this.MESSAGES_API}/?tag=${term}`)
   }
 }

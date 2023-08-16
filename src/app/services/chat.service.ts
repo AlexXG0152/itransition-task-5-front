@@ -1,15 +1,12 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
-import { IMessage } from '../interfaces/message.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ChatService {
-  constructor() {}
-
   socket = io(environment.SOCKET);
 
   public message$: BehaviorSubject<string> = new BehaviorSubject('');
@@ -35,8 +32,6 @@ export class ChatService {
 
   public getUsername = () => {
     this.socket.on('username', (username) => {
-      console.log(username);
-
       this.username$.next(username.split(':'));
     });
 

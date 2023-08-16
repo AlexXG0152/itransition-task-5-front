@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { DatabaseService } from 'src/app/services/database.service';
 
 @Component({
   selector: 'app-tags',
@@ -6,26 +7,26 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
   styleUrls: ['./tags.component.scss'],
 })
 export class TagsComponent {
+  constructor(private databaseService: DatabaseService) {}
+
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  tags: Set<string> = new Set([
-    'test1',
-    'test2',
-    'test3',
-  ]);
-
+  tags: Set<string> = this.databaseService.tagList;
   newTag!: string;
 
   addTag(tag: string) {
-    if (tag && tag.trim() !== '') {
-      this.tags.add(tag.trim());
-      this.newTag = '';
-    }
+    this.databaseService.addTag(tag);
+    this.newTag = '';
+    this.databaseService.messageList.length = 0;
+    this.databaseService.getAllMesagesByTags();
   }
 
   removeTag(tag: string) {
-    this.tags.delete(tag);
+    this.databaseService.removeTag(tag);
+    this.databaseService.messageList.length = 0;
+    this.databaseService.getAllMesagesByTags();
   }
+
 
   scrollToBottom() {
     setTimeout(() => {

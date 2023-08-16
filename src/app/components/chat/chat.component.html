@@ -1,4 +1,4 @@
-<div class="container pt-3" >
+<div class="container pt-3">
   <!-- Button trigger modal -->
   <div class="btn-group m-3" role="group" aria-label="Basic outlined example">
     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
@@ -18,6 +18,10 @@
         </div>
         <div class="message-text text-break">
           {{message.text}}
+        </div>
+        <div class="message-footer" *ngIf="getMessageTags(message.tags!).length > 1">
+          <br>
+          <span class="tags">Tags: {{ getMessageTags(message.tags!) }}</span>
         </div>
       </div>
     </div>

@@ -14,9 +14,8 @@ export class ChatComponent {
   socketId!: string;
   usernameInput?: string;
 
-  newMessage!: string;
-  messageList: IMessage[] = [];
-
+  newMessage: string = '';
+  messageList?: IMessage[] = this.databaseService.messageList;
   tags?: string;
 
   constructor(
@@ -29,23 +28,36 @@ export class ChatComponent {
       this.socketId = socketId;
     });
 
-    this.databaseService.getAllMesages().subscribe((data: IMessage[]) => {
-      // console.log('databaseService', data);
+    this.databaseService.getAllMesagesByTags();
 
-      this.messageList.push(...data);
-    });
+    // this.databaseService.getAllMesages().subscribe((data: IMessage[]) => {
+    //   console.log('databaseService', data);
 
-    this.databaseService.getAllMesagesByTags(['test1']).subscribe((data: IMessage[]) => {
-      console.log('databaseService', data);
+    //   this.messageList.push(...data);
+    // });
 
-      // this.messageList.push(...data);
-    });
+    // this.databaseService.getAllMesagesByTags(['test1']).subscribe((data: IMessage[]) => {
+    //   console.log('databaseService', data);
 
+    //   this.messageList.push(...data);
+    // });
 
     this.chatService.getNewMessage().subscribe((message: any) => {
       if (message !== '') {
-        this.messageList.push(message);
+        this.messageList!.push(message);
       }
+
+      // if (message === '') {
+      //   return;
+      // }
+      // if (message.tags.length === 0) {
+      //   this.messageList!.push(message);
+      // }
+      // for (const tag of message.tags) {
+      //   if (this.databaseService.tagList.has(tag)) {
+      //     this.messageList!.push(message);
+      //   }
+      // }
     });
 
     this.usernameInput =
@@ -53,29 +65,34 @@ export class ChatComponent {
   }
 
   sendMessage() {
-    if (this.newMessage.trim() !== '') {
-      const message: IMessage = {
-        socketId: this.socketId[0],
-        user: this.usernameInput,
-        text: this.newMessage.trim(),
-        date: Date.now().toString(),
-        tags: [
-          ...new Set(
-            this.tags
-              ?.trim()
-              .split(',')
-              .map((i) => i.trim())
-          ),
-          ...new Set(this.newMessage.match(/#\w+/g)?.map(i => i.replace('#', ''))),
-        ],
-      };
-
-      this.chatService.sendMessage(message);
-      this.databaseService.createMessage(message);
-
-      this.newMessage = '';
-      this.scrollToBottom();
+    if (this.newMessage.trim() === '') {
+      return;
     }
+
+    const message: IMessage = {
+      socketId: this.socketId[0],
+      user: this.usernameInput,
+      text: this.newMessage.trim(),
+      date: Date.now().toString(),
+      tags: [
+        ...new Set(
+          this.tags
+            ?.trim()
+            .replaceAll('#', '')
+            .split(',')
+            .map((i) => i.trim())
+        ),
+        ...new Set(
+          this.newMessage.match(/#\w+/g)?.map((i) => i.replace('#', ''))
+        ),
+      ],
+    };
+
+    this.chatService.sendMessage(message);
+    this.databaseService.createMessage(message);
+
+    this.newMessage = '';
+    this.scrollToBottom();
   }
 
   getMessageClass(message: IMessage) {
@@ -107,5 +124,9 @@ export class ChatComponent {
         this.scrollContainer.nativeElement;
       chatContainerEl.scrollTop = chatContainerEl.scrollHeight;
     });
+  }
+
+  getMessageTags(tags: string[]) {
+    return tags.map((i: string) => `#${i}`).join(', ');
   }
 }
