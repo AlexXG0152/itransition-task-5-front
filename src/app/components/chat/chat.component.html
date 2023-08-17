@@ -1,0 +1,90 @@
+<div class="container pt-3">
+  <div class="btn-group m-3" role="group" aria-label="Basic outlined example">
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+      Add User name
+    </button>
+    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop2">
+      Clear User name
+    </button>
+  </div>
+
+  <div class="messages" #scrollContainer>
+    <div *ngFor="let message of messageList" [ngClass]="setMessageClass(message)">
+      <div class="message" *ngIf="message">
+        <div class="message-header">
+          <span class="username">{{message.user}}</span>
+          <span class="date">{{message.date | date:'d.MM.yyyy hh:mm:ss'}}</span>
+        </div>
+        <div class="message-text text-break">
+          {{message.text}}
+        </div>
+        <div class="message-footer" *ngIf="getMessageTags(message.tags!).length > 1">
+          <br>
+          <span class="tags">Tags: {{ getMessageTags(message.tags!) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-div">
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="basic-addon1">#Tags</span>
+      <textarea rows="2" type="text" class="form-control" placeholder="Type your tag/tags split by comma..."
+        aria-label="tags" [(ngModel)]="tags"></textarea>
+      <button type="button" class="btn btn-danger" (click)="clearTags()">Clear Tags</button>
+    </div>
+
+    <div class="input-group mb-3">
+      <span class="input-group-text">Message</span>
+      <textarea rows="5" class="form-control" placeholder="Type your message..." aria-label="message"
+        [(ngModel)]="newMessage" (keyup)="$event.keyCode == 13 && sendMessage()"></textarea>
+      <button type="button" class="btn btn-success" (click)="sendMessage()">Send Message</button>
+    </div>
+  </div>
+</div>
+
+<!-- SET USERNAME Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">User name</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">We are will save your name untill you didn't change this.</p>
+        <div class="input-group mb-3">
+          <span class="input-group-text" id="basic-addon1">@</span>
+          <input type="text" class="form-control" placeholder="Username" aria-label="Username"
+            aria-describedby="basic-addon1" #username>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+          (click)="setUsername(username.value)">Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CLEAR Modal -->
+<div class="modal fade" id="staticBackdrop2" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel2" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel2">User name</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center">After clear your new messages will look like from `anonimous012345`</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="clearUsername()">Clear</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
