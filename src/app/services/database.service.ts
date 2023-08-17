@@ -2,7 +2,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IMessage } from '../interfaces/message.interface';
 import { environment } from 'src/environments/environment';
-import { of } from 'rxjs/internal/observable/of';
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +16,8 @@ export class DatabaseService {
   };
 
   messageList: IMessage[] = [];
-  messageTagList: Set<string> = new Set([]);
-  searchTagList: Set<string> = new Set([]);
+  messageTagList: Set<string> = new Set();
+  autocompleteTagList: Set<string> = new Set();
 
   getAllMesagesByTags() {
     const tags = this.messageTagList.size > 0 ? this.messageTagList : '';
@@ -48,7 +47,7 @@ export class DatabaseService {
     return this.http.get(`${this.API}/tags?q=${tag}`).subscribe((data: any) => {
       data.map((i: string) => {
         if (i.trim()) {
-          this.searchTagList.add(i);
+          this.autocompleteTagList.add(i);
         }
       });
     });

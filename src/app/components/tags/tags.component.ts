@@ -1,6 +1,4 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { Subject } from 'rxjs/internal/Subject';
 import { DatabaseService } from 'src/app/services/database.service';
 
 @Component({
@@ -13,24 +11,31 @@ export class TagsComponent {
 
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  // selectedTags: Set<string> = new Set([]);
-  messageTagList: Set<string>  = this.databaseService.messageTagList
+  messageTagList: Set<string> = this.databaseService.messageTagList;
+
   newTag!: string;
+  filteredTags: Set<string> = this.databaseService.autocompleteTagList;
 
   addTag(tag: string) {
+    if (this.messageTagList.has(tag)) {
+      return;
+    }
     this.databaseService.addTag(tag);
-    // this.selectedTags.add(tag)
     this.databaseService.messageList.length = 0;
     this.databaseService.getAllMesagesByTags();
-    this.filteredTags.clear()
+    this.filteredTags.clear();
     this.newTag = '';
   }
 
   removeTag(tag: string) {
     this.databaseService.removeTag(tag);
-    // this.selectedTags.delete(tag);
     this.databaseService.messageList.length = 0;
     this.databaseService.getAllMesagesByTags();
+  }
+
+  searchTags() {
+    this.filteredTags.clear();
+    this.databaseService.searchTags(this.newTag);
   }
 
   scrollToBottom() {
@@ -39,17 +44,5 @@ export class TagsComponent {
         this.scrollContainer.nativeElement;
       chatContainerEl.scrollTop = chatContainerEl.scrollHeight;
     });
-  }
-
-  filteredTags: Set<string>  = this.databaseService.searchTagList
-
-  searchTags() {
-    this.filteredTags.clear()
-    this.databaseService.searchTags(this.newTag)
-  }
-
-  selectTag(tag: string) {
-    this.messageTagList.add(tag)
-    this.filteredTags.clear()
   }
 }

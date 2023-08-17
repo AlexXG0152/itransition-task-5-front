@@ -1,8 +1,9 @@
 <div class="container pt-3">
-
+  <p class="text-center">Set of tags that you has enabled. Only those messages that are marked with tags enabled for
+    you as visible and also messages without tags. <br>By click on tag or on &times; you can remove tags from list.</p>
   <div class="tags">
     <div class="tag" *ngFor="let tag of messageTagList">
-      <li *ngIf="tag" class="text-break">
+      <li *ngIf="tag" class="text-break" (click)="removeTag(tag)">
         {{ tag }}
         <button type="button" class="btn-close" aria-label="Close" (click)="removeTag(tag)"></button>
       </li>
@@ -27,11 +28,3 @@
   </div>
 
 </div>
-
-<!--
-[(ngModel)]="newTag" (keyup)="search(searchTag.value)" #searchTag>
-
-[(ngModel)]="newTag" (keyup)="$event.keyCode == 13 && addTag(newTag)">
-
-
--->

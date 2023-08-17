@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { IMessage } from 'src/app/interfaces/message.interface';
 import { ChatService } from 'src/app/services/chat.service';
 import { DatabaseService } from 'src/app/services/database.service';
@@ -8,7 +8,7 @@ import { DatabaseService } from 'src/app/services/database.service';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss'],
 })
-export class ChatComponent {
+export class ChatComponent implements OnInit {
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
   socketId!: string;
@@ -30,38 +30,17 @@ export class ChatComponent {
 
     this.databaseService.getAllMesagesByTags();
 
-    // this.databaseService.getAllMesages().subscribe((data: IMessage[]) => {
-    //   console.log('databaseService', data);
-
-    //   this.messageList.push(...data);
-    // });
-
-    // this.databaseService.getAllMesagesByTags(['test1']).subscribe((data: IMessage[]) => {
-    //   console.log('databaseService', data);
-
-    //   this.messageList.push(...data);
-    // });
-
     this.chatService.getNewMessage().subscribe((message: any) => {
       if (message !== '') {
         this.messageList!.push(message);
       }
-
-      // if (message === '') {
-      //   return;
-      // }
-      // if (message.tags.length === 0) {
-      //   this.messageList!.push(message);
-      // }
-      // for (const tag of message.tags) {
-      //   if (this.databaseService.tagList.has(tag)) {
-      //     this.messageList!.push(message);
-      //   }
-      // }
+      this.scrollToBottom();
     });
 
     this.usernameInput =
       JSON.parse(localStorage.getItem('USERNAME')!) || 'anonimous12345';
+
+    this.scrollToBottom();
   }
 
   sendMessage() {
@@ -98,15 +77,18 @@ export class ChatComponent {
     this.databaseService.createMessage(message);
 
     this.newMessage = '';
-    this.scrollToBottom();
   }
 
-  getMessageClass(message: IMessage) {
+  setMessageClass(message: IMessage) {
     return (message.user === this.usernameInput ? 'left' : 'right') || '';
   }
 
   clearTags() {
     this.tags = '';
+  }
+
+  getMessageTags(tags: string[]) {
+    return tags.map((i: string) => `#${i}`).join(', ');
   }
 
   setUsername(username: string) {
@@ -130,9 +112,5 @@ export class ChatComponent {
         this.scrollContainer.nativeElement;
       chatContainerEl.scrollTop = chatContainerEl.scrollHeight;
     });
-  }
-
-  getMessageTags(tags: string[]) {
-    return tags.map((i: string) => `#${i}`).join(', ');
   }
 }

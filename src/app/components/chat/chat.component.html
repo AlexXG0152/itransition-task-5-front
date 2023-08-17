@@ -1,5 +1,4 @@
 <div class="container pt-3">
-  <!-- Button trigger modal -->
   <div class="btn-group m-3" role="group" aria-label="Basic outlined example">
     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
       Add User name
@@ -10,7 +9,7 @@
   </div>
 
   <div class="messages" #scrollContainer>
-    <div *ngFor="let message of messageList" [ngClass]="getMessageClass(message)">
+    <div *ngFor="let message of messageList" [ngClass]="setMessageClass(message)">
       <div class="message" *ngIf="message">
         <div class="message-header">
           <span class="username">{{message.user}}</span>
@@ -30,7 +29,7 @@
   <div class="bottom-div">
     <div class="input-group mb-3">
       <span class="input-group-text" id="basic-addon1">#Tags</span>
-      <textarea rows="3" type="text" class="form-control" placeholder="Type your tag/tags split by comma..."
+      <textarea rows="2" type="text" class="form-control" placeholder="Type your tag/tags split by comma..."
         aria-label="tags" [(ngModel)]="tags"></textarea>
       <button type="button" class="btn btn-danger" (click)="clearTags()">Clear Tags</button>
     </div>
@@ -80,7 +79,6 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p class="text-center">Are you shure?</p>
         <p class="text-center">After clear your new messages will look like from `anonimous12345`</p>
       </div>
       <div class="modal-footer">
