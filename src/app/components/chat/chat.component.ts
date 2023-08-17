@@ -23,7 +23,7 @@ export class ChatComponent implements OnInit {
     private databaseService: DatabaseService
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.chatService.getUsername().subscribe((socketId: string) => {
       this.socketId = socketId;
     });
@@ -31,7 +31,23 @@ export class ChatComponent implements OnInit {
     this.databaseService.getAllMesagesByTags();
 
     this.chatService.getNewMessage().subscribe((message: any) => {
-      if (message !== '') {
+      if (message.tags?.length !== 0) {
+        message.tags?.forEach((tag: string) => {
+          if (this.databaseService.messageTagList.has(tag) && message !== '') {
+            this.messageList!.push(message);
+            return;
+          }
+        });
+      } else if (
+        this.databaseService.messageTagList.size === 0 &&
+        message !== ''
+      ) {
+        this.messageList!.push(message);
+        return;
+      } else if (
+        this.databaseService.messageTagList.size !== 0 &&
+        message.tags?.length === 0
+      ) {
         this.messageList!.push(message);
       }
       this.scrollToBottom();
@@ -44,12 +60,12 @@ export class ChatComponent implements OnInit {
     this.scrollToBottom();
   }
 
-  sendMessage() {
+  createMessage(): IMessage | undefined {
     if (this.newMessage.trim() === '') {
       return;
     }
 
-    const createTags = [
+    const tagFormField = [
       ...new Set(
         this.tags
           ?.trim()
@@ -57,10 +73,13 @@ export class ChatComponent implements OnInit {
           .split(',')
           .map((i) => i.trim())
       ),
-      ...new Set(
-        this.newMessage.match(/#\w+/g)?.map((i) => i.replace('#', ''))
-      ),
     ];
+
+    tagFormField.push(
+      ...new Set(this.newMessage.match(/#\w+/g)?.map((i) => i.replace('#', '')))
+    );
+
+    const createTags = [...new Set(tagFormField)];
 
     if (createTags[0] === '') {
       createTags.length = 0;
@@ -74,25 +93,31 @@ export class ChatComponent implements OnInit {
       tags: createTags,
     };
 
-    this.chatService.sendMessage(message);
-    this.databaseService.createMessage(message);
-
     this.newMessage = '';
+
+    return message;
   }
 
-  setMessageClass(message: IMessage) {
+  sendMessage(): void {
+    const message: IMessage = this.createMessage()!;
+
+    this.chatService.sendMessage(message);
+    this.databaseService.createMessage(message!);
+  }
+
+  setMessageClass(message: IMessage): 'left' | 'right' {
     return (message.user === this.usernameInput ? 'left' : 'right') || '';
   }
 
-  clearTags() {
+  clearTags(): void {
     this.tags = '';
   }
 
-  getMessageTags(tags: string[]) {
+  getMessageTags(tags: string[]): string {
     return tags.map((i: string) => `#${i}`).join(', ');
   }
 
-  setUsername(username: string) {
+  setUsername(username: string): void {
     if (username.trim().length === 0) {
       localStorage.setItem(
         'USERNAME',
@@ -106,11 +131,11 @@ export class ChatComponent implements OnInit {
     this.chatService.sendUsername(username);
   }
 
-  clearUsername() {
+  clearUsername(): void {
     localStorage.setItem('USERNAME', '');
   }
 
-  scrollToBottom() {
+  scrollToBottom(): void {
     setTimeout(() => {
       const chatContainerEl: HTMLDivElement =
         this.scrollContainer.nativeElement;

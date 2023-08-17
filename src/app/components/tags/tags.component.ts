@@ -16,7 +16,7 @@ export class TagsComponent {
   newTag!: string;
   filteredTags: Set<string> = this.databaseService.autocompleteTagList;
 
-  addTag(tag: string) {
+  addTag(tag: string): void {
     if (this.messageTagList.has(tag)) {
       return;
     }
@@ -27,18 +27,18 @@ export class TagsComponent {
     this.newTag = '';
   }
 
-  removeTag(tag: string) {
+  removeTag(tag: string): void {
     this.databaseService.removeTag(tag);
     this.databaseService.messageList.length = 0;
     this.databaseService.getAllMesagesByTags();
   }
 
-  searchTags() {
+  searchTags(): void {
     this.filteredTags.clear();
     this.databaseService.searchTags(this.newTag);
   }
 
-  scrollToBottom() {
+  scrollToBottom(): void {
     setTimeout(() => {
       const chatContainerEl: HTMLDivElement =
         this.scrollContainer.nativeElement;
